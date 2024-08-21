@@ -1,0 +1,51 @@
+.requests-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.request-item {
+  border: 1px solid black;
+  padding: 10px;
+}
+
+.request-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.request-header > div {
+  flex: 1;
+  min-width: 150px;
+}
+
+.request-body {
+  margin-top: 10px;
+}
+
+.request-problem {
+  margin-bottom: 20px;
+}
+
+.problem-text {
+  font-weight: bold;
+}
+
+.problem-solutions {
+  margin-left: 20px;
+}
+
+.solution-item {
+  margin-bottom: 10px;
+}
+
+.solution-text {
+  font-weight: bold;
+}
+
+.solution-comment {
+  margin-left: 10px;
+  font-style: italic;
+}
