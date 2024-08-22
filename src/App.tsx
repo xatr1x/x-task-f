@@ -6,6 +6,7 @@ import TypesPage from './pages/TypesPage';
 import RequestComponent from './components/RequestComponent';
 import BrandsPage from './pages/BrandsPage';
 import ModelsPage from './pages/ModelsPage';
+import RequestDetailPage from './pages/RequestDetailPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/types" element={<TypesPage />} />
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/models" element={<ModelsPage />} />
+          <Route path="/requests/:id" element={<RequestDetailPage />} />
         </Route>
       </Routes>
     </Router>

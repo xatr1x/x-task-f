@@ -1,78 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
-const RequestComponent = () => {
-  const data = [
-    {
-      id: 1,
-      created_at: '2024-08-12 12:50:06.758444',
-      type: 'Laptop',
-      brand: 'Apple',
-      model: 'M2 pro',
-      problems: [
-        {
-          name: 'не включається',
-          solutions: [
-            {
-              description: 'поставити на зарядку',
-              comment: 'телефони іноді розряджаються',
-            },
-            {
-              description: 'перевірити батарею',
-              comment: 'бла бла бла',
-            },
-          ],
-        },
-        {
-          name: 'розбитий екран',
-          solutions: [
-            {
-              description: 'замовити новий',
-              comment: 'в якомусь магазині',
-            },
-            {
-              description: 'купити захисну плівку',
-              comment: 'в іншому магазині',
-            },
-          ],
-        },
-      ],
-    },
-  ];
+const RequestComponent: React.FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [requests, setRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_HOST}/api/requests`);
+        setRequests(response.data.requests);
+        setLoading(false);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          setError(`Помилка при завантаженні даних ${error}`);
+          setLoading(false);
+        } else {
+          console.error(error);
+        }
+      }
+    };
+
+    fetchRequests();
+  }, []);
+
+  if (loading) {
+    return <div>Завантаження...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div>
-      {data.map((request) => (
-        <div key={request.id} className="request">
-          <div className="request-header">
-            <div className="request-info">
-              <h4 className="request-type">{request.type}</h4>
-              <p className="request-brand-model">
-                <strong>Brand:</strong> {request.brand} <strong>Model:</strong> {request.model}
-              </p>
-            </div>
-            <div className="request-meta">
-              <p><strong>ID:</strong> {request.id}</p>
-              <p><strong>Створено:</strong> {new Date(request.created_at).toLocaleString()}</p>
-            </div>
-          </div>
-          <div className="problems">
-            {request.problems.map((problem, pIndex) => (
-              <div key={pIndex} className="problem">
-                <h5 className="problem-name">Проблема: {problem.name}</h5>
-                <div className="solutions">
-                  <div>Рішення:</div>
-                  {problem.solutions.map((solution, sIndex) => (
-                    <div key={sIndex} className="solution">
-                      <p><strong>Опис:</strong> {solution.description}</p>
-                      <p><strong>Коментарій:</strong> {solution.comment}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
+      <h1>Список заявок</h1>
+      <ul>
+        {requests.map((request) => (
+          <li key={request.id}>
+            <Link to={`/requests/${request.id}`}>
+              {request.id} - {request.type.name} - {request.brand.name} - {request.model.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

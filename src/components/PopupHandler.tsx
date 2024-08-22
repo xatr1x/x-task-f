@@ -12,8 +12,6 @@ const PopupHandler = () => {
   const [optionsBrands, setOptionsBrands] = useState<{ id: number, name: string }[]>([]);
   const [optionsModels, setOptionsModels] = useState<{ id: number, name: string }[]>([]);
   
-
-  const [requestFormValues, setRequestFormValues] = useState({ type: '', brand: '', model: '' });
   const [typeFormValue, setTypeFormValue] = useState('');
   const [brandFormValue, setBrandFormValue] = useState('');
   const [modelFormValue, setModelFormValue] = useState('');
@@ -27,13 +25,31 @@ const PopupHandler = () => {
   const toggleBrandPopup = () => setShowBrandPopup(!showBrandPopup);
   const toggleModelPopup = () => setShowModelPopup(!showModelPopup);
 
-  const handleRequestInputChange = (
-    e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setRequestFormValues({ ...requestFormValues, [name]: value });
-  };
+  /**
+   *  REQUEST
+   */
+  const handleRequestSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
+    try {
+      const requestData = {
+        typeId: +selectedTypeId,
+        brandId: +selectedBrandId,
+        modelId: +selectedModelId,
+      };
+
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_HOST}/api/requests`, requestData);
+
+      console.log('Request created successfully:', response.data);
+      toggleRequestPopup();
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error:', error.message);
+      } else {
+        console.error('Unexpected error:', error);
+      }
+    }
+  };
 
   /**
    *  TYPE
@@ -44,7 +60,7 @@ const PopupHandler = () => {
     setTypeFormValue(e.target.value);
   };
 
-  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTypeChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedTypeId(e.target.value);
   };
 
@@ -77,7 +93,7 @@ const PopupHandler = () => {
     setBrandFormValue(e.target.value);
   };
 
-  const handleBrandChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleBrandChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedBrandId(e.target.value);
   };
 
@@ -110,7 +126,7 @@ const PopupHandler = () => {
    *  MODEL
    */
 
-  const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleModelChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedModelId(e.target.value);
   };
 
@@ -153,21 +169,28 @@ const PopupHandler = () => {
         console.error('Помилка завантаження брендів:', error);
       }
     };
-
-    const fetchModels = async () => {
-      try {
-        // const response = await axios.post(`${import.meta.env.VITE_BACKEND_HOST}/api/models?type=${type}&brand=${brand}`);
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_HOST}/api/models`);
-        setOptionsModels(response.data.models);
-      } catch (error) {
-        console.error('Помилка завантаження моделей:', error);
-      }
-    }
   
-    fetchModels();
     fetchTypes();
     fetchBrands();
   }, []);
+
+  useEffect(() => {
+    if (selectedTypeId && selectedBrandId) {
+      const fetchModels = async () => {
+        try {
+          const response = await axios.get(`${import.meta.env.VITE_BACKEND_HOST}/api/models`, {
+            params: { type: selectedTypeId, brand: selectedBrandId }
+          });
+          setOptionsModels(response.data.models);
+        } catch (error) {
+          console.error('Помилка завантаження моделей:', error);
+        }
+      };
+      fetchModels();
+    } else {
+      setOptionsModels([]); // Очищаємо список моделей, якщо тип або бренд не вибрано
+    }
+  }, [selectedTypeId, selectedBrandId]);
 
   return (
     <div>
@@ -186,7 +209,7 @@ const PopupHandler = () => {
               onChange: handleTypeChange,
               type: 'select',
               options: [
-                { value: '', label: 'Виберіть варіант' }, // Дефолтна опція
+                { value: '', label: 'Виберіть варіант' }, 
                 ...optionsTypes.map(option => ({ value: option.id, label: option.name }))
               ]
             },
@@ -196,27 +219,22 @@ const PopupHandler = () => {
               onChange: handleBrandChange,
               type: 'select',
               options: [
-                { value: '', label: 'Виберіть варіант' }, // Дефолтна опція
+                { value: '', label: 'Виберіть варіант' },
                 ...optionsBrands.map(option => ({ value: option.id, label: option.name }))
               ]
             },
-            // { name: 'Модель', value: requestFormValues.model, onChange: handleRequestInputChange },
             {
               name: 'Виберіть модель',
               value: selectedModelId,
               type: 'select',
               onChange: handleModelChange,
               options: [
-                { value: '', label: 'Виберіть модель' }, // Дефолтна опція
+                { value: '', label: 'Виберіть модель' },
                 ...optionsModels.map(option => ({ value: option.id, label: option.name }))
               ]
             }
           ]}
-          onSubmit={(e) => {
-            e.preventDefault();
-            console.log('Request form submitted:', requestFormValues);
-            toggleRequestPopup();
-          }}
+          onSubmit={handleRequestSubmit}
           onClose={toggleRequestPopup}
         />
       )}
