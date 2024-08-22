@@ -15,6 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <li><Link to="/types">Типи</Link></li>
             <li><Link to="/brands">Бренди</Link></li>
             <li><Link to="/models">Моделі</Link></li>
+            <li><Link to="/problems">Проблеми</Link></li>
           </ul>
         </nav>
       </header>

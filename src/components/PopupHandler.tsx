@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import PopupComponent from './PopupComponent';
 import ButtonComponent from './ButtonComponent';
+import { useNavigate } from 'react-router-dom';
 
 const PopupHandler = () => {
   const [showRequestPopup, setShowRequestPopup] = useState(false);
   const [showTypePopup, setShowTypePopup] = useState(false);
   const [showBrandPopup, setShowBrandPopup] = useState(false);
   const [showModelPopup, setShowModelPopup] = useState(false);
+  const [showProblemPopup, setShowProblemPopup] = useState(false);
+
   const [optionsTypes, setOptionsTypes] = useState<{ id: number, name: string }[]>([]);
   const [optionsBrands, setOptionsBrands] = useState<{ id: number, name: string }[]>([]);
   const [optionsModels, setOptionsModels] = useState<{ id: number, name: string }[]>([]);
@@ -15,6 +18,7 @@ const PopupHandler = () => {
   const [typeFormValue, setTypeFormValue] = useState('');
   const [brandFormValue, setBrandFormValue] = useState('');
   const [modelFormValue, setModelFormValue] = useState('');
+  const [problemFormValue, setProblemFormValue] = useState('');
 
   const [selectedTypeId, setSelectedTypeId] = useState('');
   const [selectedBrandId, setSelectedBrandId] = useState('');
@@ -24,6 +28,9 @@ const PopupHandler = () => {
   const toggleTypePopup = () => setShowTypePopup(!showTypePopup);
   const toggleBrandPopup = () => setShowBrandPopup(!showBrandPopup);
   const toggleModelPopup = () => setShowModelPopup(!showModelPopup);
+  const toggleProblemPopup = () => setShowProblemPopup(!showProblemPopup);
+
+  const navigate = useNavigate();
 
   /**
    *  REQUEST
@@ -40,8 +47,8 @@ const PopupHandler = () => {
 
       const response = await axios.post(`${import.meta.env.VITE_BACKEND_HOST}/api/requests`, requestData);
 
-      console.log('Request created successfully:', response.data);
       toggleRequestPopup();
+      navigate(`/requests/${response.data}`);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         console.error('Axios error:', error.message);
@@ -151,6 +158,36 @@ const PopupHandler = () => {
     }
   };
 
+  /**
+   * PROBLEM
+   */
+
+  const handleProblemInputChange = (
+    e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setProblemFormValue(e.target.value);
+  };
+
+  const handleProblemSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_HOST}/api/problems`, {
+        description: problemFormValue,
+        typeId: +selectedTypeId,
+      });
+
+      console.log('Problem created successfully:', response.data);
+      toggleProblemPopup();
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error('Axios error:', error.message);
+      } else {
+        console.error('Unexpected error:', error);
+      }
+    }
+  };
+
   useEffect(() => {
     const fetchTypes = async () => {
       try {
@@ -194,10 +231,11 @@ const PopupHandler = () => {
 
   return (
     <div>
-      <ButtonComponent onClick={toggleRequestPopup} text="Зробити заявку" className="create-request-button" />
-      <ButtonComponent onClick={toggleTypePopup} text="Додати тип" className="add-type-button" />
-      <ButtonComponent onClick={toggleBrandPopup} text="Додати бренд" className="add-brand-button" />
-      <ButtonComponent onClick={toggleModelPopup} text="Додати модель" className="add-model-button" /> {/* Додаємо кнопку для відкриття попапа "Модель" */}
+      <ButtonComponent onClick={toggleRequestPopup} text="Зробити заявку" className="popup-main" />
+      <ButtonComponent onClick={toggleTypePopup} text="Додати тип" className="popup-main" />
+      <ButtonComponent onClick={toggleBrandPopup} text="Додати бренд" className="popup-main" />
+      <ButtonComponent onClick={toggleModelPopup} text="Додати модель" className="popup-main" />
+      <ButtonComponent onClick={toggleProblemPopup} text="Додати проблему" className="popup-main" />
 
       {showRequestPopup && (
         <PopupComponent
@@ -289,6 +327,29 @@ const PopupHandler = () => {
         ]}
         onSubmit={handleModelSubmit}
         onClose={toggleModelPopup}
+      />
+    )}
+
+    {showProblemPopup && (
+      <PopupComponent
+        title="Додати проблему"
+        fields={[
+          {
+            name: 'Виберіть тип',
+            value: selectedTypeId,
+            onChange: handleTypeChange,
+            type: 'select',
+            options: [
+              { value: '', label: 'Виберіть варіант' },
+              ...optionsTypes.map(option => ({ value: option.id, label: option.name }))
+            ]
+          },
+          {
+            name: 'Проблема', value: problemFormValue, onChange: handleProblemInputChange
+          }
+        ]}
+        onSubmit={handleProblemSubmit}
+        onClose={toggleProblemPopup}
       />
     )}
     </div>

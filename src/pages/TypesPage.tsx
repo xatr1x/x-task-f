@@ -9,17 +9,16 @@ interface Type {
 }
 
 const TypesPage = () => {
-  const [types, setTypes] = useState<Type[]>([]); // Створення стану для зберігання типів
-  const [loading, setLoading] = useState<boolean>(true); // Стан для індикації завантаження
-  const [error, setError] = useState<string | null>(null); // Стан для індикації помилки
+  const [types, setTypes] = useState<Type[]>([]); 
+  const [loading, setLoading] = useState<boolean>(true); 
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Функція для отримання даних з бекенду за допомогою axios
     const fetchTypes = async () => {
       try {
-        setLoading(true); // Початок завантаження
+        setLoading(true);
         const response = await axios.get(`${import.meta.env.VITE_BACKEND_HOST}/api/types`); // Ваш URL до бекенду
-        setTypes(response.data.types); // Збереження отриманих типів у стан
+        setTypes(response.data.types);
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           setError(error.message);
@@ -27,12 +26,12 @@ const TypesPage = () => {
           console.error('Unexpected error:', error);
         }
       } finally {
-        setLoading(false); // Завершення завантаження
+        setLoading(false);
       }
     };
 
-    fetchTypes(); // Виконання запиту при завантаженні компонента
-  }, []); // Порожній масив залежностей, щоб запит виконувався тільки при першому завантаженні сторінки
+    fetchTypes();
+  }, []);
 
   // Відображення завантаження, помилки або даних
   if (loading) {

@@ -216,7 +216,7 @@
   background-color: #0056b3;
 }
 
-.create-model-button, .add-model-button {
+.create-model-button, .popup-main {
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
@@ -226,7 +226,7 @@
   margin-right: 10px;
 }
 
-.create-model-button:hover, .add-model-button:hover {
+.create-model-button:hover, .popup-main:hover {
   background-color: #0056b3;
 }
 
