@@ -216,6 +216,20 @@
   background-color: #0056b3;
 }
 
+.create-model-button, .add-model-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.create-model-button:hover, .add-model-button:hover {
+  background-color: #0056b3;
+}
+
 /* Стилі для попапу */
 .popup {
   position: fixed;
@@ -350,3 +364,48 @@ footer {
   font-size: 14px;
 }
 
+/* Базові стилі для селекта */
+select {
+  appearance: none; /* Прибирає стандартний вигляд браузера */
+  background-color: #fff; /* Білий фон */
+  border: 1px solid #ccc; /* Легка сіра рамка */
+  border-radius: 4px; /* Згладжені кути */
+  padding: 8px 12px; /* Відступи всередині */
+  font-size: 16px; /* Збільшений розмір шрифту */
+  color: #333; /* Темний текст */
+  width: 100%; /* Селект розтягується на всю ширину контейнера */
+  cursor: pointer; /* Вказівник курсора */
+  transition: border-color 0.3s, box-shadow 0.3s; /* Плавні переходи для ефектів */
+}
+
+/* Змінюємо вигляд при наведенні */
+select:hover {
+  border-color: #888; /* Трохи темніша рамка при наведенні */
+}
+
+/* Фокус */
+select:focus {
+  outline: none; /* Прибираємо стандартне підсвічування */
+  border-color: #4caf50; /* Зелена рамка при фокусі */
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* Легкий зелений тінь */
+}
+
+/* Стилізація стрілки для селекта */
+select::-ms-expand {
+  display: none; /* Прибирає стандартну стрілку в Internet Explorer */
+}
+
+select {
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A//www.w3.org/2000/svg%22 width%3D%2210%22 height%3D%225%22 viewBox%3D%220 0 10 5%22%3E%3Cpath fill%3D%22%23333%22 d%3D%22M0 0l5 5 5-5z%22/%3E%3C/svg%3E'); /* Стрілка для селекта */
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px;
+}
+
+/* Робимо селект доступним у маленьких контейнерах */
+@media (max-width: 600px) {
+  select {
+    font-size: 14px; /* Зменшений шрифт на менших екранах */
+    padding: 6px 8px; /* Менший відступ */
+  }
+}

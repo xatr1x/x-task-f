@@ -5,6 +5,7 @@ import PopupHandler from './components/PopupHandler';
 import TypesPage from './pages/TypesPage';
 import RequestComponent from './components/RequestComponent';
 import BrandsPage from './pages/BrandsPage';
+import ModelsPage from './pages/ModelsPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           {/* Сторінка з типами */}
           <Route path="/types" element={<TypesPage />} />
           <Route path="/brands" element={<BrandsPage />} />
+          <Route path="/models" element={<ModelsPage />} />
         </Route>
       </Routes>
     </Router>
