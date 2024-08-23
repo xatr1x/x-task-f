@@ -13,15 +13,10 @@ const RequestDetailPage: React.FC = () => {
   const [showProblemPopup, setShowProblemPopup] = useState(false);
   const [showDetailPopup, setShowDetailPopup] = useState(false);
   const [selectedProblemId, setSelectedProblemId] = useState('');
-  const [selectedDetailDescription, setSelectedDetailDescription] =
-    useState('');
+  const [selectedDetailId, setSelectedDetailId] = useState('');
 
-  const [problems, setProblems] = useState<
-    {
-      problem: string;
-      id: number;
-    }[]
-  >([]);
+  const [problems, setProblems] = useState<{ problem: string; id: number }[]>([]);
+  const [details, setDetails] = useState<{ id: number; description: string }[]>([]);
 
   // Переносимо функцію fetchRequestData за межі useEffect
   const fetchRequestData = async () => {
@@ -50,10 +45,20 @@ const RequestDetailPage: React.FC = () => {
     setShowProblemPopup(!showProblemPopup);
   };
 
-  const toggleDetailPopup = (problemId: string) => {
+  const toggleDetailPopup = async (problemId: string) => {
     setSelectedProblemId(problemId);
-    setSelectedDetailDescription(''); // Очищуємо поле для вводу деталей
-    setShowDetailPopup(!showDetailPopup);
+    setSelectedDetailId(''); // Очищуємо вибір деталі
+
+    // Завантаження деталей для конкретної проблеми
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_HOST}/api/details?problem=${problemId}`
+      );
+      setDetails(response.data.details); // Оновлюємо стан details
+      setShowDetailPopup(!showDetailPopup);
+    } catch (error) {
+      console.error('Помилка завантаження деталей:', error);
+    }
   };
 
   const handleProblemChange = (
@@ -69,7 +74,7 @@ const RequestDetailPage: React.FC = () => {
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setSelectedDetailDescription(e.target.value);
+    setSelectedDetailId(e.target.value);
   };
 
   const handleProblemSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -77,9 +82,7 @@ const RequestDetailPage: React.FC = () => {
 
     try {
       await axios.put(
-        `${
-          import.meta.env.VITE_BACKEND_HOST
-        }/api/problems/${id}/${selectedProblemId}`
+        `${import.meta.env.VITE_BACKEND_HOST}/api/problems/${id}/${selectedProblemId}`
       );
       await fetchRequestData();
     } catch (error) {
@@ -98,7 +101,7 @@ const RequestDetailPage: React.FC = () => {
 
     try {
       await axios.post(`${import.meta.env.VITE_BACKEND_HOST}/api/details`, {
-        description: selectedDetailDescription,
+        detailId: selectedDetailId,
         problemId: selectedProblemId,
       });
       await fetchRequestData();
@@ -224,10 +227,17 @@ const RequestDetailPage: React.FC = () => {
           title='Додати деталь'
           fields={[
             {
-              name: 'Опис деталі',
-              value: selectedDetailDescription,
+              name: 'Деталь',
+              value: selectedDetailId,
               onChange: handleDetailChange,
-              type: 'text',
+              type: 'select',
+              options: [
+                { value: '', label: 'Виберіть деталь' },
+                ...details.map((detail) => ({
+                  value: detail.id.toString(),
+                  label: detail.description,
+                })),
+              ],
             },
           ]}
           onSubmit={handleDetailSubmit}
