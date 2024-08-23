@@ -230,6 +230,24 @@
   background-color: #0056b3;
 }
 
+.create-brand-button:hover, .add-brand-optional:hover {
+  background-color: #858c94;
+}
+
+.create-model-button, .popup-optional {
+  padding: 10px 20px;
+  background-color: #858c94;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.create-model-button:hover, .popup-main:hover {
+  background-color: #0056b3;
+}
+
 /* Стилі для попапу */
 .popup {
   position: fixed;
