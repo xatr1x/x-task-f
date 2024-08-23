@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const DetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>(); 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [detailsData, setDetailsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

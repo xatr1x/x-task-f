@@ -264,10 +264,11 @@ const PopupHandler = () => {
             {
               name: 'Виберіть модель',
               value: selectedModelId,
+              disabled: !(!!selectedBrandId && !!selectedTypeId),
               type: 'select',
               onChange: handleModelChange,
               options: [
-                { value: '', label: 'Виберіть модель' },
+                { value: '', label: 'Виберіть варіант' },
                 ...optionsModels.map(option => ({ value: option.id, label: option.name }))
               ]
             }

@@ -11,6 +11,7 @@ interface FieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => void;
   type?: string;
   options?: Option[]; // Опції для випадаючого списку
+  disabled?: boolean;
 }
 
 interface PopupComponentProps {
@@ -35,6 +36,7 @@ const PopupComponent: React.FC<PopupComponentProps> = ({
             <label>{field.name}:</label>
             {field.type === 'select' ? (
               <select
+                disabled={field.disabled}
                 name={field.name}
                 value={field.value}
                 onChange={
@@ -53,6 +55,7 @@ const PopupComponent: React.FC<PopupComponentProps> = ({
                 name={field.name}
                 value={field.value}
                 onChange={field.onChange}
+                disabled={field.disabled}
               />
             )}
           </div>
