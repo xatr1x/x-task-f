@@ -17,6 +17,7 @@ const RequestDetailPage: React.FC = () => {
 
   const [problems, setProblems] = useState<{ problem: string; id: number }[]>([]);
   const [details, setDetails] = useState<{ id: number; description: string }[]>([]);
+  const [loadingDetails, setLoadingDetails] = useState(false); // Додаємо стан для завантаження деталей
 
   // Переносимо функцію fetchRequestData за межі useEffect
   const fetchRequestData = async () => {
@@ -45,20 +46,24 @@ const RequestDetailPage: React.FC = () => {
     setShowProblemPopup(!showProblemPopup);
   };
 
-  const toggleDetailPopup = async (problemId: string) => {
+  const toggleDetailPopup = (problemId: string) => {
     setSelectedProblemId(problemId);
     setSelectedDetailId(''); // Очищуємо вибір деталі
+    setShowDetailPopup(true); // Відкриваємо попап одразу
 
-    // Завантаження деталей для конкретної проблеми
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_HOST}/api/details?problem=${problemId}`
-      );
-      setDetails(response.data.details); // Оновлюємо стан details
-      setShowDetailPopup(!showDetailPopup);
-    } catch (error) {
-      console.error('Помилка завантаження деталей:', error);
-    }
+    // Завантажуємо деталі асинхронно, після відкриття попапа
+    setLoadingDetails(true);
+    axios
+      .get(`${import.meta.env.VITE_BACKEND_HOST}/api/details?problem=${problemId}`)
+      .then((response) => {
+        setDetails(response.data.details);
+      })
+      .catch((error) => {
+        console.error('Помилка завантаження деталей:', error);
+      })
+      .finally(() => {
+        setLoadingDetails(false);
+      });
   };
 
   const handleProblemChange = (
@@ -100,10 +105,7 @@ const RequestDetailPage: React.FC = () => {
     e.preventDefault();
 
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_HOST}/api/details`, {
-        detailId: selectedDetailId,
-        problemId: selectedProblemId,
-      });
+      await axios.put(`${import.meta.env.VITE_BACKEND_HOST}/api/details/${id}/${selectedProblemId}/${selectedDetailId}`);
       await fetchRequestData();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -113,7 +115,7 @@ const RequestDetailPage: React.FC = () => {
       }
     }
 
-    toggleDetailPopup(''); // Закриваємо попап після додавання деталі
+    setShowDetailPopup(false); // Закриваємо попап після додавання деталі
   };
 
   useEffect(() => {
@@ -194,6 +196,9 @@ const RequestDetailPage: React.FC = () => {
           <button onClick={toggleProblemPopup} className='popup-main'>
             Додати проблему
           </button>
+          <button className="btn btn-search">
+            Пошук рішень
+          </button>
         </div>
       ) : (
         <p>Дані не знайдено</p>
@@ -231,17 +236,19 @@ const RequestDetailPage: React.FC = () => {
               value: selectedDetailId,
               onChange: handleDetailChange,
               type: 'select',
-              options: [
-                { value: '', label: 'Виберіть деталь' },
-                ...details.map((detail) => ({
-                  value: detail.id.toString(),
-                  label: detail.description,
-                })),
-              ],
+              options: loadingDetails
+                ? [{ value: '', label: 'Завантаження...' }]
+                : [
+                    { value: '', label: 'Виберіть деталь' },
+                    ...details.map((detail) => ({
+                      value: detail.id.toString(),
+                      label: detail.description,
+                    })),
+                  ],
             },
           ]}
           onSubmit={handleDetailSubmit}
-          onClose={() => toggleDetailPopup('')}
+          onClose={() => setShowDetailPopup(false)}
         />
       )}
     </div>
