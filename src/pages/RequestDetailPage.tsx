@@ -173,7 +173,7 @@ const RequestDetailPage: React.FC = () => {
                         {problem.details.map((detail: any) => (
                           <li key={detail.id}>
                             <p>
-                              <strong>Деталь:</strong> {detail.description}
+                              <strong>Анамнез:</strong> {detail.description}
                             </p>
                           </li>
                         ))}
@@ -183,7 +183,7 @@ const RequestDetailPage: React.FC = () => {
                     )}
                     {/* Кнопка для додавання нової деталі */}
                     <button onClick={() => toggleDetailPopup(problem.id)} className='popup-optional'>
-                      Додати деталь
+                      Додати анамнез
                     </button>
                   </li>
                 ))}
@@ -229,17 +229,17 @@ const RequestDetailPage: React.FC = () => {
 
       {showDetailPopup && (
         <PopupComponent
-          title='Додати деталь'
+          title='Додати анамнез'
           fields={[
             {
-              name: 'Деталь',
+              name: 'Анамнез',
               value: selectedDetailId,
               onChange: handleDetailChange,
               type: 'select',
               options: loadingDetails
                 ? [{ value: '', label: 'Завантаження...' }]
                 : [
-                    { value: '', label: 'Виберіть деталь' },
+                    { value: '', label: 'Виберіть анамнез' },
                     ...details.map((detail) => ({
                       value: detail.id.toString(),
                       label: detail.description,

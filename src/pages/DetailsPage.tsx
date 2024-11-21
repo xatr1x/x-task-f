@@ -2,17 +2,22 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import PopupComponent from '../components/PopupComponent';
 
 const DetailsPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); 
+  const { id } = useParams<{ id: string }>();
   const [detailsData, setDetailsData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDetailPopup, setShowDetailPopup] = useState(false);
+  const [newDetailDescription, setNewDetailDescription] = useState('');
 
   useEffect(() => {
     const fetchDetailsData = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_BACKEND_HOST}/api/details?problem=${id}`);
+        const response = await axios.get(
+          `${import.meta.env.VITE_BACKEND_HOST}/api/details?problem=${id}`
+        );
         setDetailsData(response.data);
         setLoading(false);
       } catch (error) {
@@ -27,6 +32,25 @@ const DetailsPage: React.FC = () => {
 
     fetchDetailsData();
   }, [id]);
+
+  const handleDetailSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${import.meta.env.VITE_BACKEND_HOST}/api/details`, {
+        problemId: parseInt(id as string, 10),
+        description: newDetailDescription,
+      });
+      setShowDetailPopup(false);
+      setNewDetailDescription('');
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_HOST}/api/details?problem=${id}`
+      );
+      setDetailsData(response.data);
+    } catch (error) {
+      console.error('Error adding detail:', error);
+    }
+  };
 
   if (loading) {
     return <div>Завантаження...</div>;
@@ -51,6 +75,21 @@ const DetailsPage: React.FC = () => {
         </ul>
       ) : (
         <p>Дані не знайдено</p>
+      )}
+      <button onClick={() => setShowDetailPopup(true)}>Додати анамнез</button>
+      {showDetailPopup && (
+        <PopupComponent
+          onClose={() => setShowDetailPopup(false)}
+          title='Додати новий амамнез'
+          fields={[
+            {
+              name: 'Опис амамнеза',
+              value: newDetailDescription,
+              onChange: (e) => setNewDetailDescription(e.target.value),
+            },
+          ]}
+          onSubmit={handleDetailSubmit}
+        />
       )}
     </div>
   );

@@ -62,6 +62,7 @@ const PopupComponent: React.FC<PopupComponentProps> = ({
         ))}
         <button type='submit'>Додати</button>
       </form>
+
       <button onClick={onClose} className='close-popup-button'>
         Закрити
       </button>
